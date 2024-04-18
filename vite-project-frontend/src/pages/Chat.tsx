@@ -14,7 +14,6 @@ const Chat = () => {
   const auth = useAuth()
   const fName = auth?.user?.name.split(" ")[0]
   const sName = auth?.user?.name.split(" ")[1]
-
   const [chatHistory, setChatHistory] = useState<message[]>([])
 
 const inputRef = useRef<HTMLInputElement | null > (null)

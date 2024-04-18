@@ -2,7 +2,7 @@
 //CONTEXT API
 
 import {createContext, useContext,  ReactNode, useState, useEffect} from "react"
-import { checkAuthUser, logInUser } from "../helpers/ApiCom";
+import { checkAuthUser, logInUser, logoutReq, signUpUser} from "../helpers/ApiCom";
 
 
 
@@ -47,10 +47,17 @@ const login = async(email:string, password:string)=>{
     }
 }
 const signup = async(name:string, email:string, password:string)=>{
-
+    const data = await signUpUser(name, email, password)
+    if(data){
+        setUser({name:data.name, email:data.email})
+        setIsLoggedIn(true)
+    }
 }
-const logout = ()=>{
-   
+const logout = async()=>{
+   await logoutReq()
+   setUser(null)
+   setIsLoggedIn(false)
+   window.location.reload()
 }
 
 const value = {

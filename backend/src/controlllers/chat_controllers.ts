@@ -31,4 +31,21 @@ export const generateResponse = async(req:Request, res:Response, next:NextFuncti
     userID.chats.push(chatResponse.data.choices[0].message)
     await userID.save()
     return res.status(200).json({chats: userID.chats})
-}   
+}
+
+// export const getChats = async(req: Request, res:Response, next:NextFunction)=>{
+//     const userID = await User.findById(res.locals.jwtData.id)
+
+//     if(!userID){
+//         return res.status(400).json({msg:'user not found!'})
+//     }
+
+//     const chats = userID.chats.map(({role, content})=>{
+//         return ({role, content})
+//     })
+
+
+//     console.log(chats)
+
+//     return res.status(200).json({chats:chats})
+// }

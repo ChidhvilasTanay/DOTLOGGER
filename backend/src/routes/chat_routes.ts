@@ -6,5 +6,5 @@ import { generateResponse } from '../controlllers/chat_controllers.js'
 const chatRouter = Router()
 
 chatRouter.post('/new', validate(chatValidator), verifyToken, generateResponse )
-
+// chatRouter.get('/new', validate(chatValidator), verifyToken, getChats)
 export default chatRouter

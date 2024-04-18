@@ -80,5 +80,23 @@ const verifyUser = async(req: Request, res: Response) => {
         return res.status(200).json({msg:'logged in successfully', name:valUser.name, email: valUser.email, id:valUser._id.toString()})
 }
 
+const userLogout = async(req:Request, res:Response)=>{
+        const valUser = await User.findById(res.locals.jwtData.id)
+        if(!valUser){
+                return res.status(400).json({msg:'user not found!'})
+        }
+        if(valUser._id.toString()  !== res.locals.jwtData.id){
+                return res.status(401).send("permissions dont match...")
+        }
 
-export {getAllUsers, createUser, loginUser, verifyUser}
+        res.clearCookie(COOKIE_NAME, {
+                httpOnly:true,
+                domain:'localhost',
+                signed:true,
+                path:'/'
+        })
+        return res.status(200).json({msg:'logged out successfully', name:valUser.name, email: valUser.email, id:valUser._id.toString()})
+}
+
+
+export {getAllUsers, createUser, loginUser, verifyUser, userLogout}
