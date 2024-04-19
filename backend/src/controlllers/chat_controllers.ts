@@ -49,3 +49,18 @@ export const generateResponse = async(req:Request, res:Response, next:NextFuncti
 
 //     return res.status(200).json({chats:chats})
 // }
+
+export const deleteChats = async( req:Request, res:Response, next:NextFunction) => {
+    const userID = await User.findById(res.locals.jwtData.id)
+    if(!userID){
+        return res.status(400).json({msg:'could not delete chats... try again later'})
+    }
+
+    if(userID._id.toString()  !== res.locals.jwtData.id){
+        return res.status(401).send("permissions dont match...")
+    }
+    //@ts-ignore
+    userID.chats = []
+    await userID.save()
+    return res.status(200).json({msg:'OK'})
+}
