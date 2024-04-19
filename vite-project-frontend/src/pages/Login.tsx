@@ -3,9 +3,11 @@ import { Box, Typography, Button } from '@mui/material'
 import CustomizedInput from '../components/SharedComponents/CustomizedInput'
 import { RiLoginBoxLine } from "react-icons/ri";
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 const Login = () => {
   const auth = useAuth()
+  const navigate = useNavigate()
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>)=>{
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
@@ -14,6 +16,7 @@ const Login = () => {
     try{
         toast.loading("Signing in...",{id: "login"})
         await auth?.login(email, password)
+        navigate("/")
         toast.success("Successfully Signed in...",{id: "login"})
     }
     catch(error){

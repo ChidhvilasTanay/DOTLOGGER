@@ -1,6 +1,6 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
-import { Typography } from '@mui/material'
+import { Typography, Box } from '@mui/material'
+import DataUsageIcon from '@mui/icons-material/DataUsage';
 const Logo = () => {
   return (
     <div style={{
@@ -10,20 +10,18 @@ const Logo = () => {
         gap:"15px"
     }}>
         <Link to={"/"}>
-            <img src="openai.png"
-            alt="openai"
-            width={"30px"}
-            height={"30px"}
-            className="image-inverted"/>
-        </Link>{" "}
+            <Box sx={{display:'flex', alignItems:'center'}}>
+            <DataUsageIcon></DataUsageIcon>
             <Typography sx={{
             display:{md:"block", sm:"none", xs:"none"},
              mr:"auto",
+             pl:'5px',
             fontWeight:"700",
             textShadow: "2px 2px 20px #000" }}>
                 <span style={{fontSize:"20px"}}>DOT</span>-LOGGER
             </Typography>
-        
+            </Box>
+          </Link>{" "}
     </div>
   )
 }

@@ -36,10 +36,10 @@ export const sendChatReq = async(message:string) =>{
     return data
 }
 
-export const initChatReq = async() =>{
-    const res = await axios.get('/chat/new')
+export const delChatReq = async() =>{
+    const res = await axios.delete('/chat/new')
     if(res.status!==200){ 
-        throw new Error('User not Authorized')
+        throw new Error('Chat not deleted')
     }
     const data = await res.data
     return data

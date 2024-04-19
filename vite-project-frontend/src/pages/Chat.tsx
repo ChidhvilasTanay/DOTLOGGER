@@ -3,7 +3,8 @@ import { useAuth } from "../context/AuthContext"
 import ChatItem from "../components/Chats/ChatItem"
 import { IoMdSend } from "react-icons/io"
 import { useRef, useState } from "react"
-import { sendChatReq } from "../helpers/ApiCom"
+import { delChatReq, sendChatReq } from "../helpers/ApiCom"
+import toast from "react-hot-toast"
 const Chat = () => {
 
   type message = {
@@ -31,6 +32,18 @@ const handleSubmit = async() =>{
     setChatHistory([...chatData.chats])
 }
 
+const handleClear = async()=>{
+  try{
+    toast.loading("Deleting chats", {id: "deleteChats"})
+    await delChatReq()
+    setChatHistory([])
+    toast.success("Deleted chats successfully", {id: "deleteChats"})
+  }
+  catch(error){
+    toast.error("Failed to Delete Chats", {id:"deleteChats"})
+  }
+}
+
   return (
     <Box sx={{
       display:"flex",
@@ -47,7 +60,8 @@ const handleSubmit = async() =>{
                 <Typography sx={{mx:"auto", fontFamily:'Ubuntu', my:4, p:3}}>
                       Enter your query in the space below
                 </Typography>
-                <Button sx={{width:"200px",
+                <Button onClick={handleClear}
+                sx={{width:"200px",
                 my:'auto',
                 color:'white',
                 fontWeight:"700", 
