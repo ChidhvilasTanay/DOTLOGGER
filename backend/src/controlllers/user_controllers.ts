@@ -5,6 +5,20 @@ import { Request, Response } from "express"
 import {createToken} from "../utils/token_manager.js"
 import COOKIE_NAME from "../utils/constants.js"
 
+const isProd = process.env.NODE_ENV === 'production'
+const cookieOptions = {
+        httpOnly: true,
+        signed: true,
+        path: '/' as const,
+        ...(isProd && { secure: true, sameSite: 'none' as const })
+}
+const clearCookieOptions = {
+        httpOnly: true,
+        signed: true,
+        path: '/' as const,
+        ...(isProd && { secure: true, sameSite: 'none' as const })
+}
+
 const getAllUsers = async (req, res) =>{
         const users = await User.find({})
         return res.status(200).json({users})
@@ -17,23 +31,12 @@ const createUser = async (req, res) => {
         const hashedpwd = await hash(password, 10) // we get a promise
         const userInstance = new User({name, email, password: hashedpwd})
         await userInstance.save()
-        res.clearCookie(COOKIE_NAME, {
-                httpOnly:true,
-                domain:'localhost',
-                signed:true,
-                path:'/'
-        })
+        res.clearCookie(COOKIE_NAME, clearCookieOptions)
         const token = createToken(userInstance._id.toString(), userInstance.email , process.env.JWT_EXPIRESIN.toString())
 
         const expires = new Date()
         expires.setDate(expires.getDate() + 7 )
-        res.cookie(COOKIE_NAME, token, {
-                path: '/',
-                domain: 'localhost',
-                expires,
-                httpOnly: true,
-                signed: true
-        })
+        res.cookie(COOKIE_NAME, token, { ...cookieOptions, expires })
         return res.status(200).json({msg:'user created', name:userInstance.name, email: userInstance.email, id:userInstance._id.toString()})
 }
 
@@ -48,23 +51,12 @@ const loginUser = async(req, res) => {
         if(!isPwdCrt){
                 return res.status(403).json({msg:'incorrect password!'})
         }
-        res.clearCookie(COOKIE_NAME, {
-                httpOnly:true,
-                domain:'localhost',
-                signed:true,
-                path:'/'
-        })
+        res.clearCookie(COOKIE_NAME, clearCookieOptions)
         const token = createToken(valUser._id.toString(), valUser.email , process.env.JWT_EXPIRESIN.toString())
 
         const expires = new Date()
         expires.setDate(expires.getDate() + 7 )
-        res.cookie(COOKIE_NAME, token, {
-                path: '/',
-                domain: 'localhost',
-                expires,
-                httpOnly: true,
-                signed: true
-        })
+        res.cookie(COOKIE_NAME, token, { ...cookieOptions, expires })
         return res.status(200).json({msg:'logged in successfully', name:valUser.name, email: valUser.email, id:valUser._id.toString()})
 }
 
@@ -89,12 +81,7 @@ const userLogout = async(req:Request, res:Response)=>{
                 return res.status(401).send("permissions dont match...")
         }
 
-        res.clearCookie(COOKIE_NAME, {
-                httpOnly:true,
-                domain:'localhost',
-                signed:true,
-                path:'/'
-        })
+        res.clearCookie(COOKIE_NAME, clearCookieOptions)
         return res.status(200).json({msg:'logged out successfully', name:valUser.name, email: valUser.email, id:valUser._id.toString()})
 }
 

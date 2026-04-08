@@ -27,6 +27,15 @@ export const checkAuthUser = async() =>{
     return data
 }
 
+export const getChatsReq = async() =>{
+    const res = await axios.get('/chat/new')
+    if(res.status!==200){
+        throw new Error('Could not fetch chats')
+    }
+    const data = await res.data
+    return data
+}
+
 export const sendChatReq = async(message:string) =>{
     const res = await axios.post('/chat/new', {message})
     if(res.status!==200){ 

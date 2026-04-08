@@ -2,8 +2,8 @@ import {Box, Avatar, Typography, Button, IconButton} from "@mui/material"
 import { useAuth } from "../context/AuthContext"
 import ChatItem from "../components/Chats/ChatItem"
 import { IoMdSend } from "react-icons/io"
-import { useRef, useState } from "react"
-import { delChatReq, sendChatReq } from "../helpers/ApiCom"
+import { useRef, useState, useEffect } from "react"
+import { delChatReq, getChatsReq, sendChatReq } from "../helpers/ApiCom"
 import toast from "react-hot-toast"
 const Chat = () => {
 
@@ -18,6 +18,14 @@ const Chat = () => {
   const [chatHistory, setChatHistory] = useState<message[]>([])
 
 const inputRef = useRef<HTMLInputElement | null > (null)
+
+useEffect(()=>{
+  getChatsReq().then((data)=>{
+    setChatHistory(data.chats)
+  }).catch((err)=>{
+    console.log(err)
+  })
+}, [])
 
 const handleSubmit = async() =>{
     const content = inputRef.current?.value as string
