@@ -17,7 +17,7 @@ type UserAuth = {
     user: User | null;
     login:(email:string, password:string)=> Promise<void>;
     signup:(name:string, email:string, password:string)=> Promise<void>;
-    logout: ()=>Promise<void> | null;
+    logout: ()=>Promise<void>;
 }
 
 
