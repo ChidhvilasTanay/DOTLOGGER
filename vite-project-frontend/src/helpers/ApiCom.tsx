@@ -1,5 +1,10 @@
 import axios from "axios"
 
+export const setAuthToken = (token: string | null) => {
+    if(token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    else delete axios.defaults.headers.common['Authorization']
+}
+
 export const logInUser = async(email: string, password: string)=>{
     const res = await axios.post("/user/login", {email, password})
     if(res.status!== 200){

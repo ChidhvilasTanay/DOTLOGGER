@@ -13,8 +13,14 @@ export const createToken = (id:string, email:string, expiresIn:string)=>{
 
 
 export const verifyToken = async(req:Request, res:Response, next: NextFunction )=>{
-    const token= req.signedCookies[`${COOKIE_NAME}`]
-    if(!token || token.trim===("")){
+    let token= req.signedCookies[`${COOKIE_NAME}`]
+    if(!token) {
+        const authHeader = req.headers.authorization
+        if(authHeader?.startsWith('Bearer ')) {
+            token = authHeader.substring(7)
+        }
+    }
+    if(!token){
         return res.status(401).json({message: "token not recieved"})
     }
     return new Promise<void>((resolve, reject)=>{

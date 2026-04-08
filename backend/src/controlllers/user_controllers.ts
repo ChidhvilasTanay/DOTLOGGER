@@ -37,7 +37,7 @@ const createUser = async (req, res) => {
         const expires = new Date()
         expires.setDate(expires.getDate() + 7 )
         res.cookie(COOKIE_NAME, token, { ...cookieOptions, expires })
-        return res.status(200).json({msg:'user created', name:userInstance.name, email: userInstance.email, id:userInstance._id.toString()})
+        return res.status(200).json({msg:'user created', name:userInstance.name, email: userInstance.email, id:userInstance._id.toString(), token})
 }
 
 const loginUser = async(req, res) => {
@@ -57,7 +57,7 @@ const loginUser = async(req, res) => {
         const expires = new Date()
         expires.setDate(expires.getDate() + 7 )
         res.cookie(COOKIE_NAME, token, { ...cookieOptions, expires })
-        return res.status(200).json({msg:'logged in successfully', name:valUser.name, email: valUser.email, id:valUser._id.toString()})
+        return res.status(200).json({msg:'logged in successfully', name:valUser.name, email: valUser.email, id:valUser._id.toString(), token})
 }
 
 //  controller for verifying the user explicitly.

@@ -2,7 +2,7 @@
 //CONTEXT API
 
 import {createContext, useContext,  ReactNode, useState, useEffect} from "react"
-import { checkAuthUser, logInUser, logoutReq, signUpUser} from "../helpers/ApiCom";
+import { checkAuthUser, logInUser, logoutReq, signUpUser, setAuthToken} from "../helpers/ApiCom";
 
 
 
@@ -29,6 +29,8 @@ export const AuthProvider = ({children}:{children: ReactNode}) =>{
     const [isLoggedIn, setIsLoggedIn] = useState(false)
 
 useEffect(()=>{
+            const storedToken = localStorage.getItem('auth_token')
+            if(storedToken) setAuthToken(storedToken)
             const checkStatus = async() =>{
                 const data = await checkAuthUser()
                 if(data){
@@ -40,10 +42,11 @@ useEffect(()=>{
     }, [])
 
 const login = async(email:string, password:string)=>{
-    const data = await logInUser(email, password) // function written in api-com.
-    if(data){ //if the data fetched by the api from the backend is present then set the fetched data as "user" state variable of the type UserAuth.
+    const data = await logInUser(email, password)
+    if(data){
         setUser({name:data.name, email:data.email})
         setIsLoggedIn(true)
+        if(data.token){ localStorage.setItem('auth_token', data.token); setAuthToken(data.token) }
     }
 }
 const signup = async(name:string, email:string, password:string)=>{
@@ -51,12 +54,15 @@ const signup = async(name:string, email:string, password:string)=>{
     if(data){
         setUser({name:data.name, email:data.email})
         setIsLoggedIn(true)
+        if(data.token){ localStorage.setItem('auth_token', data.token); setAuthToken(data.token) }
     }
 }
 const logout = async()=>{
    await logoutReq()
    setUser(null)
    setIsLoggedIn(false)
+   localStorage.removeItem('auth_token')
+   setAuthToken(null)
    window.location.reload()
 }
 
