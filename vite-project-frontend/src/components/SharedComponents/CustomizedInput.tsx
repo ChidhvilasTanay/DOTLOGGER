@@ -1,29 +1,23 @@
-import { TextField } from "@mui/material"
+import { Input } from "@/components/ui/input"
+
 type Props = {
-name: string;
-type: string;
-label: string;
+  name: string;
+  type: string;
+  label: string;
 }
 
-
-const CustomizedInput = (props: Props) => {
-    
+const CustomizedInput = ({ name, type, label }: Props) => {
   return (
-    <div>
-        <TextField variant="filled"
-            InputProps={{ style: {width:"400px", 
-            borderRadius: 10, 
-            fontSize:20, 
-            color:"white",
-            backgroundColor:"#36485e",
-            margin:"7px"}}} 
-            InputLabelProps={{style:{color:'white'}}}
-            name={props.name}
-            label={props.label}
-            type={props.type}
-            color="success" >
-
-        </TextField>
+    <div className="flex flex-col gap-1.5 w-full">
+      <label htmlFor={name} className="text-muted-foreground text-sm">
+        {label}
+      </label>
+      <Input
+        id={name}
+        name={name}
+        type={type}
+        className="bg-muted border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring w-80"
+      />
     </div>
   )
 }

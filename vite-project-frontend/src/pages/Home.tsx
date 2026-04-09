@@ -1,34 +1,32 @@
 import { useAuth } from "../context/AuthContext"
-import { Box, Typography } from "@mui/material"
 import TypewriterComponent from "typewriter-effect"
-const Home = () => {
 
+const Home = () => {
   const auth = useAuth()
   const fName = auth?.user?.name.split(" ")[0]
-  let homestring = 'Hey there! Login to continue...'
-  if(fName){
-    homestring = `Hey ${fName} ! ....How are you doing?`
-  }
-  const date = new Date();
+  const homestring = fName
+    ? `Hey ${fName}! How are you doing?`
+    : 'Hey there! Login to continue...'
 
-const options: Intl.DateTimeFormatOptions = {
-  day: '2-digit',
-  month: 'long',
-  year: 'numeric'
-};
-
-const formattedDate = date.toLocaleDateString('en-US', options);
+  const date = new Date()
+  const formattedDate = date.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
 
   return (
-    <Box sx={{display:'flex', height:'80vh', justifyContent:'center', alignItems:'center'}}>
-          <Typography sx={{my:"auto",pl:'15px', fontFamily:'Ubuntu', fontWeight:'400', fontSize:'80px'}}>
-                <TypewriterComponent 
-                options={{ strings: [homestring, formattedDate],
-                autoStart: true,
-                loop:true}}>
-                </TypewriterComponent>
-          </Typography>
-    </Box>
+    <div className="flex flex-1 items-center justify-center h-[80vh]">
+      <div className="text-foreground font-light text-5xl md:text-7xl text-center leading-tight px-4">
+        <TypewriterComponent
+          options={{
+            strings: [homestring, formattedDate],
+            autoStart: true,
+            loop: true,
+          }}
+        />
+      </div>
+    </div>
   )
 }
 

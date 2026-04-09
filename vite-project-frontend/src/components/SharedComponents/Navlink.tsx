@@ -1,21 +1,21 @@
 import { Link } from "react-router-dom"
 
 type Props = {
-    to: string;
-    bg: string;
-    text: string;
-    textColor:string;
-    onClick?:()=>Promise<void>;
+  to: string;
+  text: string;
+  onClick?: () => Promise<void>;
+  variant?: "default" | "primary";
 }
 
-const Navlink = (props: Props) => {
+const Navlink = ({ to, text, onClick, variant = "default" }: Props) => {
+  const base = "text-sm font-medium px-4 py-1.5 rounded-md transition-colors"
+  const styles = variant === "primary"
+    ? `${base} bg-foreground text-background hover:bg-foreground/90`
+    : `${base} text-muted-foreground hover:text-foreground hover:bg-muted`
+
   return (
-    <Link 
-    className="navlink"
-    to={props.to}
-    onClick={props.onClick}
-    style={{background:props.bg, color:props.textColor, }}>
-        {props.text}
+    <Link className={styles} to={to} onClick={onClick}>
+      {text}
     </Link>
   )
 }
