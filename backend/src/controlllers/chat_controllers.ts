@@ -23,7 +23,7 @@ export const generateResponse = async(req:Request, res:Response, next:NextFuncti
 
     const chatContent = chat.content.map(({ role, content }) => {
         return ({ role, content });
-    });
+    }) as {role: "user" | "assistant" | "system", content: string}[];
     
     const groq = configGroq();
     const chatResponse = await groq.chat.completions.create({
