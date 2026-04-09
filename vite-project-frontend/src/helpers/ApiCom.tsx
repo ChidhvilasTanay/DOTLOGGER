@@ -32,34 +32,6 @@ export const checkAuthUser = async() =>{
     return data
 }
 
-export const getChatsReq = async() =>{
-    const res = await axios.get('/chat/new')
-    if(res.status!==200){
-        throw new Error('Could not fetch chats')
-    }
-    const data = await res.data
-    return data
-}
-
-export const sendChatReq = async(message:string) =>{
-    const res = await axios.post('/chat/new', {message})
-    if(res.status!==200){ 
-        throw new Error('User not Authorized')
-    }
-    const data = await res.data
-    return data
-}
-
-export const delChatReq = async() =>{
-    const res = await axios.delete('/chat/new')
-    if(res.status!==200){ 
-        throw new Error('Chat not deleted')
-    }
-    const data = await res.data
-    return data
-}
-
-
 export const logoutReq = async()=>{
     const res = await axios.get("/user/logout")
     if(res.status!==200){
@@ -68,3 +40,61 @@ export const logoutReq = async()=>{
     const data = await res.data
     return data
 }
+
+export const getChatNames = async() =>{
+    const res = await axios.get('/chat/all')
+    if(res.status!==200){
+        throw new Error('Could not fetch chats')
+    }
+    const data = await res.data
+    return data
+}
+
+// export const updateChatName = async() =>{
+//     const res = await axios.get('/chat/all')
+//     if(res.status!==200){
+//         throw new Error('Could not fetch chats')
+//     }
+//     const data = await res.data
+//     return data
+// }
+ 
+export const createNewChat = async() =>{
+    const res = await axios.post('/chat/all')
+    if(res.status!==200){
+        throw new Error('Could not fetch chats')
+    }
+    const data = await res.data
+    return data
+}
+
+export const delChatReq = async() =>{
+    const res = await axios.delete('/chat/all')
+    if(res.status!==200){ 
+        throw new Error('Chat not deleted')
+    }
+    const data = await res.data
+    return data
+}
+
+export const getChatContent = async(chatId: string) =>{
+    const res = await axios.get(`/chat/${chatId}`)
+    if(res.status!==200){
+        throw new Error('Could not fetch chats')
+    }
+    const data = await res.data
+    return data
+}
+
+export const generateResponse = async(chatId: string, message:string) =>{
+    const res = await axios.post(`/chat/${chatId}`, {message})
+    if(res.status!==200){ 
+        throw new Error('User not Authorized')
+    }
+    const data = await res.data
+    return data
+}
+
+
+
+

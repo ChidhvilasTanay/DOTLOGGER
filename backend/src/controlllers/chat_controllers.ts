@@ -13,41 +13,92 @@ export const generateResponse = async(req:Request, res:Response, next:NextFuncti
         return res.status(400).json({msg:'user not found!'})
     }
 
-    const chats = userID.chats.map(({role, content})=>{
-        return ({role, content})
-    }) as {role: "user" | "assistant", content: string}[]
+    const chat = userID.chats.id(req.params.chatId)
 
-    chats.push({role:"user", content: message})
-    userID.chats.push({role:"user", content:message})
+    if(!chat){
+        return res.status(400).json({msg:'chat not found!'})
+    }
 
-    await userID.save()
+    chat.content.push({role:"user", content:message})
 
-    const groq = configGroq()
+    const chatContent = chat.content.map(({ role, content }) => {
+        return ({ role, content });
+    });
+    
+    const groq = configGroq();
     const chatResponse = await groq.chat.completions.create({
         model: "llama-3.1-8b-instant",
-        messages: chats,
-    })
+        messages: chatContent,
+    });
+    chat.content.push(chatResponse.choices[0].message);
+    await userID.save();
 
-    userID.chats.push(chatResponse.choices[0].message)
-    await userID.save()
-    return res.status(200).json({chats: userID.chats})
+    return res.status(200).json({ chat: userID.chats.id(req.params.chatId)});
 }
 
-export const getChats = async(req: Request, res:Response, next:NextFunction)=>{
+export const getChatNames = async(req: Request, res:Response, next:NextFunction)=>{
     const userID = await User.findById(res.locals.jwtData.id)
 
     if(!userID){
         return res.status(400).json({msg:'user not found!'})
     }
 
-    const chats = userID.chats.map(({role, content})=>{
-        return ({role, content})
+    const chats = userID.chats.map(({_id, name})=>{
+        return ({_id, name})
     })
 
 
     console.log(chats)
 
     return res.status(200).json({chats:chats})
+}
+
+// export const updateChatName = async (req: Request, res:Response, next:NextFunction)=>{
+//     const userID = await User.findById(res.locals.jwtData.id)
+
+//     if(!userID){
+//         return res.status(400).json({msg:'user not found!'})
+//     }
+    
+
+// }
+export const getChatContent = async(req: Request, res:Response, next:NextFunction)=>{
+    const userID = await User.findById(res.locals.jwtData.id)
+
+    if(!userID){
+        return res.status(400).json({msg:'user not found!'})
+    }
+
+    const chat = userID.chats.id(req.params.chatId)
+
+    if(!chat){
+        return res.status(400).json({msg:'chat not found!'})
+    }
+
+    const chatContent = chat.content.map(({role, content})=>{
+        return ({role, content})
+    })
+
+
+    console.log(chatContent)
+
+    return res.status(200).json({chatContent: chatContent})
+}
+
+export const createNewChat = async(req: Request, res:Response, next:NextFunction)=>{
+    const userID = await User.findById(res.locals.jwtData.id)
+
+    if(!userID){
+        return res.status(400).json({msg:'user not found!'})
+    }
+
+    userID.chats.push({name: "NEW CHAT", content:[]})
+
+    const newChat = userID.chats.at(-1)
+
+    await userID.save()
+
+    return res.status(200).json({id: newChat._id, chatName:newChat.name})
 }
 
 export const deleteChats = async( req:Request, res:Response, next:NextFunction) => {
