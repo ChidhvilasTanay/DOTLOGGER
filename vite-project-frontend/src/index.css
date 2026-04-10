@@ -63,6 +63,27 @@ html, body {
   font-weight: 400;
 }
 
+/* Hacker font for auth inputs only */
+.auth-input input[type="password"],
+.auth-input input[type="email"],
+.auth-input input[type="text"] {
+  font-family: 'Share Tech Mono', monospace !important;
+}
+
+.auth-input input[type="password"] {
+  font-size: 1.2rem;
+  letter-spacing: 0.15em;
+}
+
+.auth-input input:-webkit-autofill,
+.auth-input input:-webkit-autofill:hover,
+.auth-input input:-webkit-autofill:focus {
+  font-family: 'Share Tech Mono', monospace !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--muted) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* Custom scrollbar */
 .custom-scroll {
   scrollbar-width: thin;

@@ -27,7 +27,7 @@ const getAllUsers = async (req, res) =>{
 const createUser = async (req, res) => {
         const {name, email, password} = req.body
         const userCheck = await User.findOne({email:email})
-        if(userCheck) return res.status(200).json({msg:'user already exists!'})
+        if(userCheck) return res.status(400).json({msg:'An account with this email already exists'})
         const hashedpwd = await hash(password, 10) // we get a promise
         const userInstance = new User({name, email, password: hashedpwd})
         await userInstance.save()

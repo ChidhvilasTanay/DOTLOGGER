@@ -15,12 +15,14 @@ export const logInUser = async(email: string, password: string)=>{
 }
 
 export const signUpUser = async(name:string, email: string, password: string)=>{
-    const res = await axios.post("/user/signup", {name, email, password})
-    if(res.status!== 200){
-        throw new Error("unable to login")
+    try{
+        const res = await axios.post("/user/signup", {name, email, password})
+        const data = await res.data
+        return data
     }
-    const data = await res.data
-    return data
+    catch(err: any){
+        throw new Error(err.response?.data?.msg)
+    }
 }
 
 export const checkAuthUser = async() =>{

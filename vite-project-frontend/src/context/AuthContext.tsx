@@ -50,12 +50,18 @@ const login = async(email:string, password:string)=>{
     }
 }
 const signup = async(name:string, email:string, password:string)=>{
-    const data = await signUpUser(name, email, password)
-    if(data){
+    try{
+        const data = await signUpUser(name, email, password)
+        if(data){
         setUser({name:data.name, email:data.email})
         setIsLoggedIn(true)
         if(data.token){ localStorage.setItem('auth_token', data.token); setAuthToken(data.token) }
     }
+    }
+    catch(err:any){
+        throw err
+    }
+    
 }
 const logout = async()=>{
    await logoutReq()

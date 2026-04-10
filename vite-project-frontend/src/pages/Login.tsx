@@ -26,18 +26,19 @@ const Login = () => {
 
   return (
     <div className="flex flex-1 items-center justify-center min-h-[80vh]">
-      <Card className="w-full max-w-sm bg-card border-border shadow-xl">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-center text-xl font-semibold text-foreground">
-            Sign in
+      <Card className="w-full max-w-sm bg-card border-border shadow-2xl rounded-2xl">
+        <CardHeader className="pb-2 pt-8 px-8">
+          <CardTitle className="text-center text-2xl font-bold text-foreground tracking-tight">
+            Welcome back
           </CardTitle>
+          <p className="text-center text-muted-foreground text-sm mt-1">Sign in to your account</p>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <CardContent className="px-8 pb-8">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2">
             <CustomizedInput type="email" name="email" label="Email" />
             <CustomizedInput type="password" name="password" label="Password" />
-            <Button type="submit" className="w-full mt-2">
-              Continue
+            <Button type="submit" variant="default" className="w-full mt-2 font-semibold tracking-wide">
+              Continue →
             </Button>
           </form>
         </CardContent>
