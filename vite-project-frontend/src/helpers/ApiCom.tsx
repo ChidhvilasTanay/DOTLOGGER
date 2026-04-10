@@ -68,6 +68,15 @@ export const createNewChat = async() =>{
     return data
 }
 
+export const deleteChat = async(chatId : string) =>{
+    const res = await axios.delete('/chat/delete', {data:{chatId}})
+    if(res.status!==200){
+        throw new Error('Could not delete chats')
+    }
+    const data = res.data
+    return data
+}
+
 export const delChatReq = async() =>{
     const res = await axios.delete('/chat/all')
     if(res.status!==200){ 

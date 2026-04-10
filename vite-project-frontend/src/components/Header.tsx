@@ -1,6 +1,8 @@
 import Logo from './SharedComponents/Logo'
 import { useAuth } from '../context/AuthContext'
 import Navlink from './SharedComponents/Navlink'
+import { BsChatSquareText } from 'react-icons/bs'
+import { LuLogOut } from 'react-icons/lu'
 
 const Header = () => {
   const auth = useAuth()
@@ -11,8 +13,8 @@ const Header = () => {
         <nav className="flex items-center gap-2">
           {auth?.isLoggedIn ? (
             <>
-              <Navlink to="/chat" text="Open Logs" />
-              <Navlink to="/" text="Logout" onClick={auth.logout} />
+              <Navlink to="/chat" text="CHATS" icon={<BsChatSquareText size={14} />} />
+              <Navlink to="/" text="Logout" icon={<LuLogOut size={14} />} onClick={auth.logout} />
             </>
           ) : (
             <>

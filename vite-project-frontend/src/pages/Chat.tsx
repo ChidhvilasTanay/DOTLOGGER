@@ -2,9 +2,10 @@ import { useAuth } from "../context/AuthContext"
 import ChatItem from "../components/Chats/ChatItem"
 import { IoMdSend } from "react-icons/io"
 import { useRef, useState, useEffect } from "react"
-import { getChatNames, updateChatName, createNewChat, delChatReq, getChatContent, generateResponse } from "../helpers/ApiCom"
+import { getChatNames, updateChatName, createNewChat, delChatReq, getChatContent, generateResponse, deleteChat} from "../helpers/ApiCom"
 import toast from "react-hot-toast"
 import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 type Message = {
   role: "user" | "assistant"
@@ -25,7 +26,7 @@ const Chat = () => {
   const fName = auth?.user?.name.split(" ")[0]
   const sName = auth?.user?.name.split(" ")[1]
   const [chatId, setChatId] = useState<string>("")
-  const [chatName, setChatName] = useState<string>("NEW CHAT")
+  const [chatName, setChatName] = useState<string>("Hi There !")
   const [editTileId, setEditTileId] = useState<string | null >(null)
   const [chatHistory, setChatHistory] = useState<Message[]>([])
   const [sidebarContent, setSideBarContent] = useState<tile[]>([])
@@ -79,13 +80,30 @@ const Chat = () => {
 
   const handleEditTile = async (newName: string) => {
      if(!newName.trim() || !editTileId) return
-     await updateChatName(editTileId, newName)
+     const currentEditTileId = editTileId
     setSideBarContent((prev)=>{
       return  prev.map((tile)=>{
         return (tile._id===editTileId) ? {...tile, name:newName} : tile
       })
     })
+    if(chatId===editTileId)setChatName(newName)
     setEditTileId(null)
+    await updateChatName(currentEditTileId, newName)
+  }
+
+  const handleDeleteChat = async (delChatId: string)=> {
+    if(!delChatId)return
+    if(delChatId===chatId){
+      setChatName("Hi There!")
+      setChatHistory([])
+      setChatId("")
+    }
+    setSideBarContent((prev)=>{
+      return prev.filter((tile)=>{
+        return (tile._id!==delChatId)
+      })
+    })
+    await deleteChat(delChatId)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -131,9 +149,9 @@ const Chat = () => {
           {/* Chat tiles */}
           <div className="flex-1 overflow-y-auto min-h-0 space-y-1 custom-scroll pr-1">
             {sidebarContent.map(({ _id, name }) => (
-              editTileId === _id ? (
+              <div key={_id} className="flex items-center gap-1 group">
+              {editTileId === _id ? (
                 <input
-                  key={_id}
                   autoFocus
                   defaultValue={name}
                   onBlur={(e) => handleEditTile(e.target.value)}
@@ -145,7 +163,6 @@ const Chat = () => {
                 />
               ) : (
                 <button
-                  key={_id}
                   onClick={() => handleCurrentChat(_id, name)}
                   onDoubleClick={() => setEditTileId(_id)}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors truncate
@@ -156,8 +173,24 @@ const Chat = () => {
                 >
                   {name}
                 </button>
-              )
-            ))}
+              )}
+
+              <DropdownMenu>
+                <DropdownMenuTrigger className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-foreground rounded">
+                  ···
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="right" align="start">
+                  <DropdownMenuItem onClick={() => setEditTileId(_id)}>
+                    Rename
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDeleteChat(_id)} className="text-destructive focus:text-destructive">
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            ))
+            }
           </div>
 
           <div className="w-full h-px bg-border mt-2 mb-2 shrink-0" />

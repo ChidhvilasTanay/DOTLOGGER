@@ -2,7 +2,7 @@ import {Router} from 'express'
 import { verifyToken } from '../utils/token_manager.js'
 import { chatValidator } from '../utils/validators.js'
 import { validate } from '../utils/validators.js'
-import { deleteChats, generateResponse, getChatNames, getChatContent, createNewChat, updateChatName} from '../controlllers/chat_controllers.js'
+import { deleteChats, generateResponse, getChatNames, getChatContent, createNewChat, updateChatName, deleteChat} from '../controlllers/chat_controllers.js'
 const chatRouter = Router()
 
 
@@ -12,5 +12,6 @@ chatRouter.delete('/all', verifyToken, deleteChats )
 chatRouter.get('/:chatId', verifyToken, getChatContent)
 chatRouter.post('/:chatId', validate(chatValidator), verifyToken, generateResponse )
 chatRouter.patch('/rename', verifyToken, updateChatName)
+chatRouter.delete('/delete', verifyToken, deleteChat)
 
 export default chatRouter
