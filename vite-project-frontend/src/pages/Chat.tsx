@@ -6,6 +6,7 @@ import { getChatNames, updateChatName, createNewChat, delChatReq, getChatContent
 import toast from "react-hot-toast"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import TypewriterComponent from "typewriter-effect"
 
 type Message = {
   role: "user" | "assistant"
@@ -212,9 +213,21 @@ const Chat = () => {
 
       {/* Chat area */}
       <div className={`flex flex-col flex-1 min-w-0 overflow-hidden ${!chatId ? "justify-center" : ""}`}>
-        <h2 className="text-center text-foreground/70 text-sm font-medium tracking-widest uppercase mb-3 shrink-0">
-          {chatName}
-        </h2>
+        {chatId ? (
+          <h2 className="text-center text-foreground/70 text-sm font-medium tracking-widest uppercase mb-3 shrink-0">
+            {chatName}
+          </h2>
+        ) : (
+          <div className="text-center text-foreground/70 text-xl font-light mb-3 shrink-0">
+            <TypewriterComponent
+              options={{
+                strings: [`What's up ${fName}?`, "Start a new chat…"],
+                autoStart: true,
+                loop: true,
+              }}
+            />
+          </div>
+        )}
 
         {/* Messages — grows to fill remaining space, scrolls internally */}
         <div className={`overflow-y-auto min-h-0 pr-1 space-y-1 custom-scroll ${chatId ? "flex-1" : ""}`}>
