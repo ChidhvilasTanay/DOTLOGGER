@@ -53,15 +53,25 @@ export const getChatNames = async(req: Request, res:Response, next:NextFunction)
     return res.status(200).json({chats:chats})
 }
 
-// export const updateChatName = async (req: Request, res:Response, next:NextFunction)=>{
-//     const userID = await User.findById(res.locals.jwtData.id)
+export const updateChatName = async (req: Request, res:Response, next:NextFunction)=>{
+    const userID = await User.findById(res.locals.jwtData.id)
 
-//     if(!userID){
-//         return res.status(400).json({msg:'user not found!'})
-//     }
+    if(!userID){
+        return res.status(400).json({msg:'user not found!'})
+    }
     
+    const chat = userID.chats.id(req.body.chatId)
 
-// }
+    if(!chat){
+        return res.status(400).json({msg: "chat not found!"})
+    }
+
+    chat.name = req.body.newName
+
+    await userID.save();
+
+    return res.status(200).json({msg: "OK"})
+}
 export const getChatContent = async(req: Request, res:Response, next:NextFunction)=>{
     const userID = await User.findById(res.locals.jwtData.id)
 

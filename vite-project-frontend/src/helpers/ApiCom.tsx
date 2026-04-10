@@ -50,14 +50,14 @@ export const getChatNames = async() =>{
     return data
 }
 
-// export const updateChatName = async() =>{
-//     const res = await axios.get('/chat/all')
-//     if(res.status!==200){
-//         throw new Error('Could not fetch chats')
-//     }
-//     const data = await res.data
-//     return data
-// }
+export const updateChatName = async(chatId: string, newName: string) =>{
+    const res = await axios.patch('/chat/rename', {chatId, newName})
+    if(res.status!==200){
+        throw new Error('Could not fetch chats')
+    }
+    const data = await res.data
+    return data
+}
  
 export const createNewChat = async() =>{
     const res = await axios.post('/chat/all')

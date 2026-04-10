@@ -2,7 +2,7 @@ import { useAuth } from "../context/AuthContext"
 import ChatItem from "../components/Chats/ChatItem"
 import { IoMdSend } from "react-icons/io"
 import { useRef, useState, useEffect } from "react"
-import { getChatNames, createNewChat, delChatReq, getChatContent, generateResponse } from "../helpers/ApiCom"
+import { getChatNames, updateChatName, createNewChat, delChatReq, getChatContent, generateResponse } from "../helpers/ApiCom"
 import toast from "react-hot-toast"
 import { Button } from "@/components/ui/button"
 
@@ -26,7 +26,7 @@ const Chat = () => {
   const sName = auth?.user?.name.split(" ")[1]
   const [chatId, setChatId] = useState<string>("")
   const [chatName, setChatName] = useState<string>("NEW CHAT")
-  // const [editTileId, setEditTileId] = useState<string | null >(null)
+  const [editTileId, setEditTileId] = useState<string | null >(null)
   const [chatHistory, setChatHistory] = useState<Message[]>([])
   const [sidebarContent, setSideBarContent] = useState<tile[]>([])
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -77,10 +77,16 @@ const Chat = () => {
     setChatHistory([...chatData.chat.content])
   }
 
-  // const handleEditTile = async (newName: string, tileId: string) => {
-  //    setEditTileId(tileId)
-  //    await setNewChatName(editTileId, newName)
-  // }
+  const handleEditTile = async (newName: string) => {
+     if(!newName.trim() || !editTileId) return
+     await updateChatName(editTileId, newName)
+    setSideBarContent((prev)=>{
+      return  prev.map((tile)=>{
+        return (tile._id===editTileId) ? {...tile, name:newName} : tile
+      })
+    })
+    setEditTileId(null)
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -125,17 +131,32 @@ const Chat = () => {
           {/* Chat tiles */}
           <div className="flex-1 overflow-y-auto min-h-0 space-y-1 custom-scroll pr-1">
             {sidebarContent.map(({ _id, name }) => (
-              <button
-                key={_id}
-                onClick={() => handleCurrentChat(_id, name)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors truncate
-                  ${chatId === _id
-                    ? "bg-muted text-foreground font-medium"
-                    : "text-foreground/60 hover:bg-muted/60 hover:text-foreground"
-                  }`}
-              >
-                {name}
-              </button>
+              editTileId === _id ? (
+                <input
+                  key={_id}
+                  autoFocus
+                  defaultValue={name}
+                  onBlur={(e) => handleEditTile(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleEditTile((e.target as HTMLInputElement).value)
+                    if (e.key === "Escape") setEditTileId(null)
+                  }}
+                  className="w-full px-3 py-2 rounded-lg text-sm bg-muted outline-none text-foreground border border-border"
+                />
+              ) : (
+                <button
+                  key={_id}
+                  onClick={() => handleCurrentChat(_id, name)}
+                  onDoubleClick={() => setEditTileId(_id)}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors truncate
+                    ${chatId === _id
+                      ? "bg-muted text-foreground font-medium"
+                      : "text-foreground/60 hover:bg-muted/60 hover:text-foreground"
+                    }`}
+                >
+                  {name}
+                </button>
+              )
             ))}
           </div>
 
