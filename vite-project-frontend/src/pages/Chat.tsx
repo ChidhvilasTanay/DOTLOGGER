@@ -44,6 +44,7 @@ const Chat = () => {
   useEffect(() => {
     if (!chatId) return
     getChatContent(chatId).then((data) => {
+      if(data.chatContent.length>0)
       setChatHistory(data.chatContent)
     }).catch((err) => {
       console.log(err)
@@ -61,6 +62,7 @@ const Chat = () => {
     setChatName(newChatName)
     setChatHistory([])
     setSideBarContent((prev)=>{return [...prev,{_id: newChatId, name: newChatName}]})
+    return newChatId
   }
 
   const handleCurrentChat =async (chatId: string, chatName: string) => {
@@ -73,8 +75,9 @@ const Chat = () => {
     if (!content.trim()) return
     if (inputRef.current) inputRef.current.value = ""
     const newMessage: Message = { role: "user", content }
+    const activeChatId = chatId || await handleNewChat()
     setChatHistory((prev) => [...prev, newMessage])
-    const chatData = await generateResponse(chatId, content)
+    const chatData = await generateResponse(activeChatId, content)
     setChatHistory([...chatData.chat.content])
   }
 
@@ -208,13 +211,13 @@ const Chat = () => {
       </aside>
 
       {/* Chat area */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+      <div className={`flex flex-col flex-1 min-w-0 overflow-hidden ${!chatId ? "justify-center" : ""}`}>
         <h2 className="text-center text-foreground/70 text-sm font-medium tracking-widest uppercase mb-3 shrink-0">
           {chatName}
         </h2>
 
         {/* Messages — grows to fill remaining space, scrolls internally */}
-        <div className="flex-1 overflow-y-auto min-h-0 pr-1 space-y-1 custom-scroll">
+        <div className={`overflow-y-auto min-h-0 pr-1 space-y-1 custom-scroll ${chatId ? "flex-1" : ""}`}>
           {
             chatHistory.map((message, index) => (
             <ChatItem content={message.content} role={message.role} key={index} />
@@ -225,8 +228,8 @@ const Chat = () => {
 
           {/* Input bar */}
 
-        {chatId ? (
-        <div className="flex items-center gap-2 mt-3 shrink-0 bg-muted rounded-xl border border-border px-4 py-2">
+        
+        <div className="flex items-center gap-2 mt-3 shrink-0 bg-muted rounded-xl border border-border px-4 py-2 max-w-3xl mx-auto w-full">
           <input
             type="text"
             ref={inputRef}
@@ -241,19 +244,6 @@ const Chat = () => {
             <IoMdSend size={18} />
           </button>
         </div>
-
-          ) : (
-        <div className="flex items-center justify-center mt-3 shrink-0">
-          <Button
-            variant="outline"
-            onClick={handleNewChat}
-            className="px-6 py-2 text-sm font-semibold tracking-wide"
-          >
-            + New Chat
-          </Button>
-        </div>
-        
-         ) }
 
       </div>
     </div>
