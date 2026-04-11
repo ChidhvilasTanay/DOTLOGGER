@@ -97,15 +97,33 @@ export const getChatContent = async(chatId: string) =>{
     return data
 }
 
-export const generateResponse = async(chatId: string, message:string) =>{
-    const res = await axios.post(`/chat/${chatId}`, {message})
-    if(res.status!==200){ 
-        throw new Error('User not Authorized')
-    }
-    const data = await res.data
-    return data
-}
+// export const generateResponse = async(chatId: string, message:string) =>{
+//     const res = await axios.post(`/chat/${chatId}`, {message})
+//     if(res.status!==200){ 
+//         throw new Error('User not Authorized')
+//     }
+//     const data = await res.data
+//     return data
+// }
 
+export const generateResponse = async(chatId: string, message:string, onChunk: (token: string)=>void) =>{
+    const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1"}/chat/${chatId}`, {
+        method:'POST',
+        headers: {'Content-Type' : 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({message})
+    })
+
+    const reader = response.body!.getReader()
+    const decoder = new TextDecoder()
+
+    while(true){
+        const {done, value}= await reader.read()
+        if(done) break
+        const token = decoder.decode(value)
+        onChunk(token)
+    }
+}
 
 
 

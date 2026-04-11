@@ -53,7 +53,7 @@ const Chat = () => {
   }, [chatId])
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    chatEndRef.current?.scrollIntoView({ behavior: "instant" })
   }, [chatHistory])
 
 
@@ -71,15 +71,23 @@ const Chat = () => {
     setChatName(chatName)
   }
 
+  const onChunk = (token:string) => {
+    setChatHistory((prev)=>{
+      const lastMessage = prev[prev.length-1]
+      const history = prev.slice(0,-1)
+      return [...history, {...lastMessage, content: lastMessage.content+token}]
+    })
+  }
+
   const handleSubmit = async () => {
     const content = inputRef.current?.value as string
     if (!content.trim()) return
     if (inputRef.current) inputRef.current.value = ""
-    const newMessage: Message = { role: "user", content }
     const activeChatId = chatId || await handleNewChat()
-    setChatHistory((prev) => [...prev, newMessage])
-    const chatData = await generateResponse(activeChatId, content)
-    setChatHistory([...chatData.chat.content])
+    const newMessage: Message = { role: "user", content }
+    const newResponse: Message = {role: "assistant", content:""}
+    setChatHistory((prev) => [...prev, newMessage, newResponse])
+    await generateResponse(activeChatId, content, onChunk)
   }
 
   const handleEditTile = async (newName: string) => {

@@ -15,3 +15,4 @@ chatRouter.patch('/rename', verifyToken, updateChatName)
 chatRouter.delete('/delete', verifyToken, deleteChat)
 
 export default chatRouter
+

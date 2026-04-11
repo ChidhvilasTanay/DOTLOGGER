@@ -26,14 +26,28 @@ export const generateResponse = async(req:Request, res:Response, next:NextFuncti
     }) as {role: "user" | "assistant" | "system", content: string}[];
     
     const groq = configGroq();
-    const chatResponse = await groq.chat.completions.create({
+    res.setHeader('Content-Type', 'text/event-stream')
+    res.setHeader('Cache-Control', 'no-cache')
+    res.setHeader('Connection', 'keep-alive')
+
+    const stream = await groq.chat.completions.create({
         model: "llama-3.1-8b-instant",
         messages: chatContent,
+        stream:true
     });
-    chat.content.push(chatResponse.choices[0].message);
+
+    let fullResponse =""
+
+    for await (const chunk of stream){
+        const token = chunk.choices[0]?.delta?.content || ""
+        fullResponse +=token
+        res.write(token)
+    }
+
+    chat.content.push({role:"assistant", content:fullResponse})
     await userID.save();
 
-    return res.status(200).json({ chat: userID.chats.id(req.params.chatId)});
+    res.end()
 }
 
 export const getChatNames = async(req: Request, res:Response, next:NextFunction)=>{
