@@ -26,15 +26,29 @@ export const generateResponse = async(req:Request, res:Response, next:NextFuncti
     }) as {role: "user" | "assistant" | "system", content: string}[];
     
     const groq = configGroq();
+
+    // create the stream BEFORE sending headers, so a provider failure can still
+    // return a clean JSON error instead of a half-open stream / HTML error page
+    let stream
+    try{
+        stream = await groq.chat.completions.create({
+            model: process.env.GROQ_MODEL || "openai/gpt-oss-120b",
+            messages: chatContent,
+            stream: true,
+            // gpt-oss is a reasoning model: hide the analysis channel so that
+            // delta.content starts arriving immediately
+            reasoning_format: "hidden",
+            reasoning_effort: "low"
+        });
+    }
+    catch(err: any){
+        console.error('groq request failed:', err?.message)
+        return res.status(502).json({msg: err?.error?.error?.message || err?.message || 'upstream model request failed'})
+    }
+
     res.setHeader('Content-Type', 'text/event-stream')
     res.setHeader('Cache-Control', 'no-cache')
     res.setHeader('Connection', 'keep-alive')
-
-    const stream = await groq.chat.completions.create({
-        model: "llama-3.1-8b-instant",
-        messages: chatContent,
-        stream:true
-    });
 
     let fullResponse =""
 
