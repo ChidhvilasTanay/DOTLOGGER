@@ -87,7 +87,13 @@ const Chat = () => {
     const newMessage: Message = { role: "user", content }
     const newResponse: Message = {role: "assistant", content:""}
     setChatHistory((prev) => [...prev, newMessage, newResponse])
-    await generateResponse(activeChatId, content, onChunk)
+    try {
+      await generateResponse(activeChatId, content, onChunk)
+    } catch (err: any) {
+      // drop the empty assistant bubble so a failure doesn't leave a blank reply
+      setChatHistory((prev) => prev.slice(0, -1))
+      toast.error(err?.message || "Could not generate a response")
+    }
   }
 
   const handleEditTile = async (newName: string) => {

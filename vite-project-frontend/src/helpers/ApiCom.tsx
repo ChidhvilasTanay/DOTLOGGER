@@ -107,20 +107,37 @@ export const getChatContent = async(chatId: string) =>{
 // }
 
 export const generateResponse = async(chatId: string, message:string, onChunk: (token: string)=>void) =>{
-    const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1"}/chat/${chatId}`, {
+    // strip trailing slashes so the join never produces a double slash (which 404s)
+    const baseURL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1").replace(/\/+$/, "")
+    const authToken = localStorage.getItem('auth_token')
+
+    const response = await fetch(`${baseURL}/chat/${chatId}`, {
         method:'POST',
-        headers: {'Content-Type' : 'application/json'},
+        headers: {
+            'Content-Type' : 'application/json',
+            // match axios: cross-site cookies are unreliable, so send the bearer token too
+            ...(authToken ? {Authorization: `Bearer ${authToken}`} : {})
+        },
         credentials: 'include',
         body: JSON.stringify({message})
     })
 
-    const reader = response.body!.getReader()
+    if(!response.ok || !response.body){
+        // never stream an error page into the chat - surface it instead
+        const body = await response.text().catch(()=> "")
+        let detail = body
+        try{ detail = JSON.parse(body).msg || JSON.parse(body).message || body }catch{ /* not json */ }
+        if(/^\s*<(!doctype|html)/i.test(detail)) detail = ""
+        throw new Error(`Request failed (${response.status})${detail ? `: ${detail}` : ""}`)
+    }
+
+    const reader = response.body.getReader()
     const decoder = new TextDecoder()
 
     while(true){
         const {done, value}= await reader.read()
         if(done) break
-        const token = decoder.decode(value)
+        const token = decoder.decode(value, {stream: true})
         onChunk(token)
     }
 }
